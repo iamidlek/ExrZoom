@@ -1,5 +1,6 @@
 import http from "http";
-import WebSocket from "ws";
+// import WebSocket from "ws";
+import SocketIo from "SocketIo";
 import express from "express";
 
 const app = express();
@@ -10,36 +11,45 @@ app.use("/public", express.static(__dirname + "/public"));
 app.get("/", (_, res) => res.render("home"));
 app.get("/*", (_, res) => res.redirect("/"));
 
-const handleListen = () => console.log(`Listening on http://localhost:3000`);
 
 // express를 이용해 만든 http 서버
-const server = http.createServer(app);
+const httpServer = http.createServer(app);
 // http서버 위에 웹소켓 서버
+// const wss = new WebSocket.Server({ server });
 
-const wss = new WebSocket.Server({ server });
+// io
+const wsServer = SocketIo(server);
 
-function onSocketClose() {
-  console.log("Disconnected from the Browser ❌");
-}
 
-const sockets = [];
-
-wss.on("connection", (socket) => {
-  sockets.push(socket);
-  socket["nickname"] = "Anon";
-  console.log("Connected to Browser ✅");
-  socket.on("close", onSocketClose);
-  socket.on("message", (msg) => {
-    const message = JSON.parse(msg);
-    switch (message.type) {
-      case "new_message":
-        sockets.forEach((aSocket) =>
-          aSocket.send(`${socket.nickname}: ${message.payload}`)
-        );
-      case "nickname":
-        socket["nickname"] = message.payload;
-    }
-  });
+wsServer.on("connection", (socket) => {
+  console.log(socket);
 });
 
-server.listen(3000, handleListen);
+
+// function onSocketClose() {
+//   console.log("Disconnected from the Browser ❌");
+// }
+
+// const sockets = [];
+
+// wss.on("connection", (socket) => {
+  //   sockets.push(socket);
+  //   socket["nickname"] = "Anon";
+  //   console.log("Connected to Browser ✅");
+  //   socket.on("close", onSocketClose);
+  //   socket.on("message", (msg) => {
+    //     const message = JSON.parse(msg);
+    //     switch (message.type) {
+      //       case "new_message":
+      //         sockets.forEach((aSocket) =>
+      //           aSocket.send(`${socket.nickname}: ${message.payload}`)
+      //         );
+      //       case "nickname":
+      //         socket["nickname"] = message.payload;
+      //     }
+      //   });
+      // });
+      
+const handleListen = () => console.log(`Listening on http://localhost:3000`);
+httpserver.listen(3000, handleListen);
+      
