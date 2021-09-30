@@ -11,7 +11,6 @@ app.use("/public", express.static(__dirname + "/public"));
 app.get("/", (_, res) => res.render("home"));
 app.get("/*", (_, res) => res.redirect("/"));
 
-
 // express를 이용해 만든 http 서버
 const httpServer = http.createServer(app);
 // http서버 위에 웹소켓 서버
@@ -20,9 +19,13 @@ const httpServer = http.createServer(app);
 // io
 const wsServer = SocketIo(server);
 
-
 wsServer.on("connection", (socket) => {
-  console.log(socket);
+  socket.on("enter_room", (msg, done) => {
+    console.log(msg);
+    setTimeout(() => {
+      done(); // 호출한 것은 front 쪽에서 실행됨
+    }, 10000);
+  });
 });
 
 
