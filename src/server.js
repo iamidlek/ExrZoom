@@ -20,11 +20,12 @@ const httpServer = http.createServer(app);
 const wsServer = SocketIo(server);
 
 wsServer.on("connection", (socket) => {
-  socket.on("enter_room", (msg, done) => {
-    console.log(msg);
-    setTimeout(() => {
-      done(); // 호출한 것은 front 쪽에서 실행됨
-    }, 10000);
+  socket.onAny((event) => {
+    console.log(`Socket Event: ${event}`);
+  });
+  socket.on("enter_room", (roomName, done) => {
+    socket.join(roomName);
+    done();
   });
 });
 
